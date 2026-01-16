@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="90 prompts professionnels pour le travail social par Adrien Guionie">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Prompts IA">
+    <title>Générateur de Prompts IA - Travail Social</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #c7d2fe 100%);
+            min-height: 100vh;
+            padding: 16px;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+            padding: 24px;
+            min-height: calc(100vh - 32px);
+            display: flex;
+            flex-direction: column;
+        }
+        h1 { font-size: 24px; color: #4f46e5; margin-bottom: 8px; }
+        .subtitle { font-size: 14px; color: #6b7280; margin-bottom: 16px; }
+        .warning { 
+            background: #fef3c7; 
+            border-left: 4px solid #f59e0b; 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin-bottom: 24px; 
+            font-size: 14px; 
+            color: #92400e; 
+        }
+        .filters { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 16px; 
+            margin-bottom: 24px; 
+        }
+        label { 
+            display: block; 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: #374151; 
+            margin-bottom: 8px; 
+        }
+        select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 8px; 
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .prompts-container { 
+            background: #f9fafb; 
+            border-radius: 8px; 
+            padding: 16px; 
+            flex: 1;
+            overflow-y: auto; 
+            margin-bottom: 24px;
+            max-height: 400px;
+        }
+        .prompts-title { 
+            font-weight: 600; 
+            color: #374151; 
+            margin-bottom: 12px; 
+            font-size: 14px; 
+        }
+        .prompts-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 8px; 
+        }
+        .prompt-card { 
+            position: relative;
+            background: white; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 8px; 
+            padding: 12px; 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .prompt-card:hover { border-color: #4f46e5; background: #eef2ff; }
+        .prompt-card:active { transform: scale(0.98); }
+        .prompt-code { 
+            font-family: monospace; 
+            font-size: 11px; 
+            color: #4f46e5; 
+            margin-bottom: 4px; 
+        }
+        .prompt-title { font-size: 13px; font-weight: 500; color: #1f2937; }
+        .fav-btn { 
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+        .fav-btn:hover { transform: scale(1.25); }
+        .fav-btn:active { transform: scale(1.1); }
+        .selected-prompt { 
+            background: linear-gradient(135deg, #eef2ff 0%, #dbeafe 100%);
+            border-left: 4px solid #4f46e5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .selected-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: start; 
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+        .selected-title { font-size: 18px; font-weight: 600; color: #1f2937; flex: 1; }
+        .copy-btn { 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .copy-btn:hover { background: #4338ca; }
+        .copy-btn:active { transform: scale(0.95); }
+        .selected-text { 
+            font-size: 14px; 
+            color: #374151; 
+            line-height: 1.6; 
+            white-space: pre-wrap; 
+        }
+        .tip { 
+            background: #dbeafe; 
+            border: 1px solid #93c5fd; 
+            border-radius: 8px; 
+            padding: 16px; 
+            font-size: 13px; 
+            color: #1e40af;
+            margin-bottom: 16px;
+        }
+        .footer { 
+            padding-top: 24px; 
+            border-top: 1px solid #e5e7eb; 
+            text-align: center; 
+            color: #6b7280; 
+            font-size: 13px; 
+            line-height: 1.8;
+        }
+        .footer strong { color: #1f2937; }
+        .footer em { font-style: italic; color: #4f46e5; }
+        
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .container { padding: 16px; border-radius: 12px; }
+            h1 { font-size: 20px; }
+            .filters { grid-template-columns: 1fr; gap: 12px; }
+            .prompts-grid { grid-template-columns: 1fr; }
+            .selected-header { flex-direction: column; align-items: stretch; }
+            .copy-btn { width: 100%; justify-content: center; }
+        }
+        
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4f46e5;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            max-width: 90%;
+        }
+        .install-prompt button {
+            background: white;
+            color: #4f46e5;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .install-prompt .close {
+            background: transparent;
+            color: white;
+            padding: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="install-prompt" id="installPrompt">
+        <span>📱 Installer l'application pour un accès rapide</span>
+        <button id="installBtn">Installer</button>
+        <button class="close" id="closeInstall">✕</button>
+    </div>
+
+    <div class="container">
+        <h1>✨ Générateur de Prompts IA</h1>
+        <p class="subtitle">Par Adrien Guionie - <span id="total">90</span> prompts disponibles</p>
+        
+        <div class="warning">
+            <strong>⚠️ Cadre d'utilisation :</strong> Toujours relire et contextualiser. Ne jamais saisir de données personnelles. L'IA ne se substitue pas au jugement professionnel.
+        </div>
+
+        <div class="filters">
+            <div>
+                <label>Population / Contexte</label>
+                <select id="pop">
+                    <option value="all">Toutes</option>
+                    <option value="enfance">Enfance</option>
+                    <option value="handicap">Handicap</option>
+                    <option value="agees">Pers. âgées</option>
+                    <option value="precarite">Précarité</option>
+                    <option value="famille">Famille</option>
+                </select>
+            </div>
+            <div>
+                <label>Type d'action</label>
+                <select id="act">
+                    <option value="all">Toutes</option>
+                    <option value="analyse">Analyse</option>
+                    <option value="entretien">Entretien</option>
+                    <option value="rapport">Rapport</option>
+                    <option value="mail">Mail</option>
+                    <option value="synthese">Synthèse</option>
+                </select>
+            </div>
+            <div>
+                <label>Favoris (<span id="favcount">0</span>)</label>
+                <select id="favfilter">
+                    <option value="all">Tous les prompts</option>
+                    <option value="favs">⭐ Mes favoris uniquement</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="prompts-container">
+            <div class="prompts-title">Prompts disponibles (<span id="count">0</span>)</div>
+            <div class="prompts-grid" id="list"></div>
+        </div>
+
+        <div id="selected"></div>
+
+        <div class="tip">
+            <strong>💡 Astuce :</strong> Sélectionnez vos critères, choisissez un prompt, puis complétez les [crochets] avec vos informations.
+        </div>
+
+        <div class="footer">
+            <strong>Adrien Guionie</strong><br>
+            impulsion socIAl<br>
+            a.guionie@impulsion-social.fr<br><br>
+            Auteur de <em>"L'IA, un outil pour le travail social ?"</em> aux éditions érès
+        </div>
+    </div>
+
+    <script src="prompts-data.js"></script>
+    <script>
+        let favs = JSON.parse(localStorage.getItem('favs') || '[]');
+        let sel = null;
+        let deferredPrompt;
+
+        console.log('Prompts chargés:', db.length);
+
+        function render() {
+            const pop = document.getElementById('pop').value;
+            const act = document.getElementById('act').value;
+            const ff = document.getElementById('favfilter').value;
+            
+            const filtered = db.filter(p => {
+                const okAct = act === 'all' || p[3] === act;
+                const okPop = pop === 'all' || p[4] === '*' || p[4].includes(pop);
+                const okFav = ff === 'all' || favs.includes(p[0]);
+                return okAct && okPop && okFav;
+            });
+
+            console.log('Prompts filtrés:', filtered.length);
+
+            document.getElementById('count').textContent = filtered.length;
+            
+            const listHtml = filtered.map((p) => {
+                const dbIndex = db.findIndex(item => item[0] === p[0]);
+                const isFav = favs.includes(p[0]);
+                const escapedCode = p[0].replace(/'/g, "\\'");
+                return `
+                    <div class="prompt-card" onclick="select(${dbIndex})">
+                        <button class="fav-btn" onclick="event.stopPropagation();toggleFav('${escapedCode}')"> ${isFav ? '⭐' : '☆'}</button>
+                        <div class="prompt-code">${p[0]}</div>
+                        <div class="prompt-title">${p[1]}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('list').innerHTML = listHtml;
+        }
+
+        function select(i) {
+            sel = db[i];
+            const titleHtml = sel[1];
+            const textHtml = sel[2].replace(/\n/g, '<br>');
+            
+            document.getElementById('selected').innerHTML = `
+                <div class="selected-prompt">
+                    <div class="selected-header">
+                        <div class="selected-title">${titleHtml}</div>
+                        <button class="copy-btn" onclick="copy()">📋 Copier</button>
+                    </div>
+                    <div class="selected-text">${textHtml}</div>
+                </div>
+            `;
+            document.getElementById('selected').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function copy() {
+            const textToCopy = sel[2];
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showCopySuccess();
+                }).catch(() => {
+                    fallbackCopy(textToCopy);
+                });
+            } else {
+                fallbackCopy(textToCopy);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const t = document.createElement('textarea');
+            t.value = text;
+            t.style.position = 'fixed';
+            t.style.opacity = '0';
+            document.body.appendChild(t);
+            t.select();
+            try {
+                document.execCommand('copy');
+                showCopySuccess();
+            } catch (err) {
+                alert('Erreur lors de la copie');
+            }
+            document.body.removeChild(t);
+        }
+
+        function showCopySuccess() {
+            const btn = document.querySelector('.copy-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copié !';
+            btn.style.background = '#10b981';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#4f46e5';
+            }, 2000);
+        }
+
+        function toggleFav(id) {
+            if (favs.includes(id)) {
+                favs = favs.filter(f => f !== id);
+            } else {
+                favs.push(id);
+            }
+            localStorage.setItem('favs', JSON.stringify(favs));
+            document.getElementById('favcount').textContent = favs.length;
+            render();
+        }
+
+        // PWA Installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').style.display = 'flex';
+        });
+
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                document.getElementById('installPrompt').style.display = 'none';
+            }
+        });
+
+        document.getElementById('closeInstall').addEventListener('click', () => {
+            document.getElementById('installPrompt').style.display = 'none';
+        });
+
+        // Register service worker - DÉSACTIVÉ pour debug
+        /*
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
+        }
+        */
+
+        // Event listeners
+        document.getElementById('pop').addEventListener('change', render);
+        document.getElementById('act').addEventListener('change', render);
+        document.getElementById('favfilter').addEventListener('change', render);
+
+        // Initialize
+        document.getElementById('favcount').textContent = favs.length;
+        render();
+    </script>
+</body>
+</html>
